@@ -1,6 +1,7 @@
 from PIL import Image
 import numpy as np
 from geojson import GeometryCollection, Polygon, Point, Feature, dump, FeatureCollection
+import webcolors
 
 def clamp(x):
     return max(0, min(x, 255))
@@ -28,12 +29,11 @@ for x in range(398):
         r, g, b = rgb_scale.getpixel((x, y))
         scaleVals[x][y] = (r,g,b)
 
-for y in range(32):
+for y in range(2048):
     #mapVals.append([])
-    for x in range(64):
-        r, g, b = rgb_map.getpixel((x*64, y*64))
+    for x in range(4096):
+        r, g, b = rgb_map.getpixel((x, y))
         mapVals[y][x] = (r,g,b)
-        ##mapVals[y][x] = ("#{0:02x}{1:02x}{2:02x}".format(clamp(r), clamp(g), clamp(b)))
 
 
 ozoneVals = np.zeros((32,64))
@@ -41,25 +41,19 @@ ozoneVals = np.zeros((32,64))
 features = []
 counter = 0
 tempPoly = []
-for i in range(32):
-    for j in range(64):
+for i in range(4):
+    for j in range(8):
         for k in range(398):
             for l in range(40):
                 print(i,j,k,l)
                 if (mapVals[j][i]) == (scaleVals[k][l]):
                     ozoneVals[i][j] = pixeltoDOB * k
         poly = Polygon([[(xChange(j),yChange(i)), (xChange(j+1), yChange(i)) , (xChange(j+1), yChange(i+1)) ,(xChange(j), yChange(i+1)), (xChange(j), yChange(i))]])
-        features.append(Feature(geometry=poly, properties={"country": "Spain", "fill": "#80ffff"}))
-
-
-print(mapVals[2][128]) ##just to see if it works
-
-#poly = Polygon([[(2.38, 57.322), (23.194, -20.28), (-120.43, 19.15), (2.38, 57.322)]])
-#poly2 = Point((200.0, 37.24))
-
-
-#features.append(Feature(geometry=poly, properties={"country": "Spain", "fill": "#80ffff"}))
-#features.append(Feature(geometry=poly2, properties={"country": "Spain"}))
+        color = (mapVals[(j*32)][(i*32)])
+        print(color)
+        hex = webcolors.rgb_to_hex(color)
+        print(hex)
+        features.append(Feature(geometry=poly, properties={"country": "Spain", "fill": hex}))
 
 # add more features...
 
