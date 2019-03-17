@@ -5,6 +5,11 @@ from geojson import GeometryCollection, Polygon, Point, Feature, dump, FeatureCo
 def clamp(x):
     return max(0, min(x, 255))
 
+def xChange(x):
+    return((5.625*x)-180)
+def yChange(y):
+    return((-5.625*y)+90)
+
 map = Image.open('ozone.png')
 scale = Image.open('scale.png')
 rgb_map = map.convert('RGB')
@@ -36,14 +41,14 @@ ozoneVals = np.zeros((32,64))
 features = []
 counter = 0
 tempPoly = []
-for i in range(4):
-    for j in range(8):
+for i in range(32):
+    for j in range(64):
         for k in range(398):
             for l in range(40):
                 print(i,j,k,l)
                 if (mapVals[j][i]) == (scaleVals[k][l]):
                     ozoneVals[i][j] = pixeltoDOB * k
-        poly = Polygon([[(j*64,i*64), ((j*64)+64,i*64), ((j*64) + 64, (i*64)+64), (j*64,(i*64)+64),(j*64,i*64)]])
+        poly = Polygon([[(xChange(j),yChange(i)), (xChange(j+1), yChange(i)) , (xChange(j+1), yChange(i+1)) ,(xChange(j), yChange(i+1)), (xChange(j), yChange(i))]])
         features.append(Feature(geometry=poly, properties={"country": "Spain", "fill": "#80ffff"}))
 
 
